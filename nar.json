@@ -1,0 +1,9 @@
+{
+  "name": "Nar.SDL",
+  "version": 100,
+  "nar-version": 100,
+  "dependencies": {
+    "Nar.Base": 100,
+    "Nar.Program": 100
+  }
+}

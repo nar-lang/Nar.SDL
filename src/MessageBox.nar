@@ -1,0 +1,47 @@
+module Nar.SDL.MessageBox
+
+type Icon
+    = IconError
+    | IconWarning
+    | IconInformation
+
+type ButtonsLayout
+    = ButtonsLayoutLeftToRight
+    | ButtonsLayoutRightToLeft
+
+type ButtonFlag
+    = ButtonFlagNone
+    | ButtonFlagsReturnKeyDefault
+    | ButtonFlagsEscapeKeyDefault
+
+alias ButtonData =
+    { flag: ButtonFlag
+    , buttonId: Int
+    , text: String 
+    }
+
+alias ColorScheme= 
+    { background : Color
+    , text : Color
+    , buttonBorder : Color
+    , buttonBackground : Color
+    , buttonSelected : Color
+    }
+
+alias Color = (Int, Int, Int)
+
+alias MessageBoxData = 
+    { icon: Icon
+    , buttonsLayout: ButtonsLayout
+    , window: Maybe[Nar.SDL.Window.Window]
+    , title: String
+    , message: String
+    , buttons: List[ButtonData]
+    , colorScheme: Maybe[ColorScheme]
+    }
+
+def native showSimpleMessageBox(
+    icon: Icon, title: String, message: String, window: Maybe[Nar.SDL.Window.Window]
+): Task[String, ()]
+
+def native showMessageBox(data: MessageBoxData): Task[String, Int]

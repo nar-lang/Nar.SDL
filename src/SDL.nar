@@ -1,0 +1,21 @@
+module Nar.SDL
+
+type InitSubSystem
+    = InitTimer
+    | InitAudio
+    | InitVideo
+    | InitJoystick
+    | InitHaptic
+    | InitGameController
+    | InitEvents
+    | InitSensor
+
+def native SDL_init(subsystems: List[InitSubSystem]): Task[String, List[InitSubSystem]]
+
+def native SDL_initSubSystem(subsystem: InitSubSystem): Task[String, InitSubSystem]
+
+def native SDL_quitSubSystem(subsystem: InitSubSystem): Task[x, InitSubSystem]
+
+def native SDL_wasInit(subSystems: List[InitSubSystem], toMsg: (List[InitSubSystem]):msg ): Cmd[msg]
+
+def native SDL_quit: Task[x, ()]
