@@ -33,7 +33,7 @@ alias Color = (Int, Int, Int)
 alias MessageBoxData = 
     { icon: Icon
     , buttonsLayout: ButtonsLayout
-    , window: Maybe[Nar.SDL.Window.Window]
+    , window: Maybe[Nar.SDL.Video.Window]
     , title: String
     , message: String
     , buttons: List[ButtonData]
@@ -41,7 +41,7 @@ alias MessageBoxData =
     }
 
 def native showSimpleMessageBox(
-    icon: Icon, title: String, message: String, window: Maybe[Nar.SDL.Window.Window]
+    icon: Icon, title: String, message: String, window: Maybe[nar.sdl.video.window]
 ): Task[String, ()]
 
 def native showMessageBox(data: MessageBoxData): Task[String, Int]

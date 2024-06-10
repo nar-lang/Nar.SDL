@@ -165,21 +165,15 @@ void show_message_box(
     }
 }
 
-nar_object_t native__MessageBox_showSimpleMessageBox(
-        nar_runtime_t rt,
-        nar_object_t icon,
-        nar_object_t title,
-        nar_object_t message,
-        nar_object_t window) {
+nar_object_t native__MessageBox_showSimpleMessageBox(nar_runtime_t rt,
+        nar_object_t icon, nar_object_t title, nar_object_t message, nar_object_t window) {
     nar_program_task_new_fn_t task_new = nar->get_metadata(rt, NAR_META__Nar_Program_task_new);
     return task_new(rt,
             nar->make_tuple(rt, 4, (nar_object_t[]) {icon, title, message, window}),
             &show_simple_message_box);
 }
 
-nar_object_t native__MessageBox_showMessageBox(
-        nar_runtime_t rt,
-        nar_object_t data) {
+nar_object_t native__MessageBox_showMessageBox(nar_runtime_t rt, nar_object_t data) {
     nar_program_task_new_fn_t task_new = nar->get_metadata(rt, NAR_META__Nar_Program_task_new);
     return task_new(rt, data, &show_message_box);
 }

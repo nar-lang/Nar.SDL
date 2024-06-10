@@ -1,0 +1,40 @@
+module Nar.SDL.Video
+
+alias native Window
+
+type WindowPosition
+  = WindowPositionUndefined
+  | WindowPositionCentered
+  | WindowPositionAt(x: Int, y: Int)
+
+type WindowFlag
+    = WindowFlagFullscreen 
+    | WindowFlagOpengl 
+    | WindowFlagShown 
+    | WindowFlagHidden 
+    | WindowFlagBorderless 
+    | WindowFlagResizable 
+    | WindowFlagMinimized 
+    | WindowFlagMaximized 
+    | WindowFlagMouseGrabbed
+    | WindowFlagInputFocus
+    | WindowFlagMouseFocus
+    | WindowFlagFullscreenDesktop
+    | WindowFlagForeign 
+    | WindowFlagAllowHighdpi
+    | WindowFlagMouseCapture
+    | WindowFlagAlwaysOnTop
+    | WindowFlagSkipTaskbar
+    | WindowFlagUtility          
+    | WindowFlagTooltip          
+    | WindowFlagPopupMenu
+    | WindowFlagKeyboardGrabbed
+    | WindowFlagVulkan           
+    | WindowFlagMetal            
+    | WindowFlagInputGrabbed
+
+def native createWindow(
+  title: String, pos: WindowPosition, width: Int, heigh: Int, flags: List[WindowFlag]
+): Task[String, Window]
+
+def native destroyWindow(window: Window): Task[Never, ()]

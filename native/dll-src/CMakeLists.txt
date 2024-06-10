@@ -18,6 +18,7 @@ add_library(Nar.SDL SHARED
         _package.h
         SDL.c
         MessageBox.c
+        Video.c
 )
 
 find_package(SDL2 REQUIRED)

@@ -1,3 +1,0 @@
-module Nar.SDL.Window
-
-alias native Window

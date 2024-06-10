@@ -33,6 +33,16 @@ Uint32 subsystem_to_flag(nar_runtime_t rt, nar_object_t subSystem) {
     return 0;
 }
 
+nar_bool_t update() {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        if (SDL_QUIT == event.type) {
+            return nar_false;
+        }
+    }
+    return nar_true;
+}
+
 Uint32 subsystem_list_to_flag(nar_runtime_t rt, nar_object_t subSystems) {
     Uint32 flags = 0;
     nar_object_t it = subSystems;
@@ -44,14 +54,13 @@ Uint32 subsystem_list_to_flag(nar_runtime_t rt, nar_object_t subSystems) {
     return flags;
 }
 
-void SDL_init_exec(
-        nar_runtime_t rt,
-        nar_object_t payload,
-        nar_program_task_resolve_fn_t resolve,
-        nar_program_task_reject_fn_t reject,
-        nar_task_state_t *task_state) {
+void init_sdl(nar_runtime_t rt, nar_object_t payload, nar_program_task_resolve_fn_t resolve,
+        nar_program_task_reject_fn_t reject, nar_task_state_t *task_state) {
     Uint32 flags = subsystem_list_to_flag(rt, payload);
     if (0 == SDL_Init(flags)) {
+        nar_program_updater_add_t updater_add =
+                nar->get_metadata(rt, NAR_META__Nar_Program_updater_add);
+        updater_add(rt, update, 0);
         resolve(rt, payload, task_state);
     } else {
         nar_object_t error = nar->make_string(rt, SDL_GetError());
@@ -59,12 +68,12 @@ void SDL_init_exec(
     }
 }
 
-nar_object_t SDL_init(nar_runtime_t rt, nar_object_t subSystems) {
+nar_object_t native__init(nar_runtime_t rt, nar_object_t subSystems) {
     nar_program_task_new_fn_t task_new = nar->get_metadata(rt, NAR_META__Nar_Program_task_new);
-    return task_new(rt, subSystems, SDL_init_exec);
+    return task_new(rt, subSystems, init_sdl);
 }
 
-void SDL_initSubSystem_exec(
+void init_subsystem_exec(
         nar_runtime_t rt,
         nar_object_t payload,
         nar_program_task_resolve_fn_t resolve,
@@ -79,12 +88,12 @@ void SDL_initSubSystem_exec(
     }
 }
 
-nar_object_t SDL_initSubSystem(nar_runtime_t rt, nar_object_t subSystem) {
+nar_object_t native__initSubSystem(nar_runtime_t rt, nar_object_t subSystem) {
     nar_program_task_new_fn_t task_new = nar->get_metadata(rt, NAR_META__Nar_Program_task_new);
-    return task_new(rt, subSystem, SDL_initSubSystem_exec);
+    return task_new(rt, subSystem, init_subsystem_exec);
 }
 
-void SDL_quitSubSystem_exec(
+void quit_subsystem(
         nar_runtime_t rt,
         nar_object_t payload,
         nar_program_task_resolve_fn_t resolve,
@@ -95,12 +104,12 @@ void SDL_quitSubSystem_exec(
     resolve(rt, payload, task_state);
 }
 
-nar_object_t SDL_quitSubSystem(nar_runtime_t rt, nar_object_t subSystem) {
+nar_object_t native__quitSubSystem(nar_runtime_t rt, nar_object_t subSystem) {
     nar_program_task_new_fn_t task_new = nar->get_metadata(rt, NAR_META__Nar_Program_task_new);
-    return task_new(rt, subSystem, SDL_quitSubSystem_exec);
+    return task_new(rt, subSystem, quit_subsystem);
 }
 
-void SDL_wasInit_exec(
+void was_init(
         nar_runtime_t rt,
         nar_object_t payload,
         nar_program_cmd_resolve_fn_t resolve,
@@ -144,22 +153,25 @@ void SDL_wasInit_exec(
     resolve(rt, list, cmd_state);
 }
 
-nar_object_t SDL_wasInit(nar_runtime_t rt, nar_object_t subSystems, nar_object_t toMsg) {
+nar_object_t native__wasInit(nar_runtime_t rt, nar_object_t subSystems, nar_object_t toMsg) {
     nar_program_cmd_new_fn_t cmd_new = nar->get_metadata(rt, NAR_META__Nar_Program_cmd_new);
-    return cmd_new(rt, toMsg, subSystems, SDL_wasInit_exec);
+    return cmd_new(rt, toMsg, subSystems, was_init);
 }
 
-void SDL_quit_exec(
+void quit_sdl(
         nar_runtime_t rt,
         nar_object_t payload,
         nar_program_task_resolve_fn_t resolve,
         nar_program_task_reject_fn_t reject,
         nar_task_state_t *task_state) {
     SDL_Quit();
+    nar_program_updater_remove_t updater_remove =
+            nar->get_metadata(rt, NAR_META__Nar_Program_updater_remove);
+    updater_remove(rt, update);
     resolve(rt, nar->make_unit(rt), task_state);
 }
 
-nar_object_t SDL_quit(nar_runtime_t rt) {
+nar_object_t native__quit(nar_runtime_t rt) {
     nar_program_task_new_fn_t task_new = nar->get_metadata(rt, NAR_META__Nar_Program_task_new);
-    return task_new(rt, nar->make_unit(rt), SDL_quit_exec);
+    return task_new(rt, nar->make_unit(rt), quit_sdl);
 }

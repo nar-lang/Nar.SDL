@@ -10,12 +10,12 @@ type InitSubSystem
     | InitEvents
     | InitSensor
 
-def native SDL_init(subsystems: List[InitSubSystem]): Task[String, List[InitSubSystem]]
+def native init(subsystems: List[InitSubSystem]): Task[String, List[InitSubSystem]]
 
-def native SDL_initSubSystem(subsystem: InitSubSystem): Task[String, InitSubSystem]
+def native initSubSystem(subsystem: InitSubSystem): Task[String, InitSubSystem]
 
-def native SDL_quitSubSystem(subsystem: InitSubSystem): Task[x, InitSubSystem]
+def native quitSubSystem(subsystem: InitSubSystem): Task[x, InitSubSystem]
 
-def native SDL_wasInit(subSystems: List[InitSubSystem], toMsg: (List[InitSubSystem]):msg ): Cmd[msg]
+def native wasInit(subSystems: List[InitSubSystem], toMsg: (List[InitSubSystem]):msg ): Cmd[msg]
 
-def native SDL_quit: Task[x, ()]
+def native quit: Task[Never, ()]
