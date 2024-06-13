@@ -19,3 +19,5 @@ def native quitSubSystem(subsystem: InitSubSystem): Task[x, InitSubSystem]
 def native wasInit(subSystems: List[InitSubSystem], toMsg: (List[InitSubSystem]):msg ): Cmd[msg]
 
 def native quit: Task[Never, ()]
+
+def native onQuit: Sub[msg]

@@ -9,6 +9,7 @@ nar_int_t init(nar_t *n, nar_runtime_t rt) {
     nar->register_def(rt, "Nar.SDL", "quitSubSystem", &native__quitSubSystem, 1);
     nar->register_def(rt, "Nar.SDL", "wasInit", &native__wasInit, 1);
     nar->register_def(rt, "Nar.SDL", "quit", &native__quit, 0);
+    nar->register_def(rt, "Nar.SDL", "onQuit", &native__onQuit, 1);
 
     nar->register_def(rt, "Nar.SDL.MessageBox", "showSimpleMessageBox",
             &native__MessageBox_showSimpleMessageBox, 4);

@@ -5,6 +5,8 @@
 #include <nar-package.h>
 #include "include/Nar.SDL.h"
 
+#define NAR_META__Nar_SDL_onQuit_sub "Nar.SDL.onQuit:sub"
+
 extern nar_t *nar;
 
 nar_object_t native__init(nar_runtime_t rt, nar_object_t subSystems);
@@ -16,6 +18,8 @@ nar_object_t native__quitSubSystem(nar_runtime_t rt, nar_object_t subSystem);
 nar_object_t native__wasInit(nar_runtime_t rt, nar_object_t subSystems, nar_object_t toMsg);
 
 nar_object_t native__quit(nar_runtime_t rt);
+
+nar_object_t native__onQuit(nar_runtime_t rt, nar_object_t toMsg);
 
 nar_object_t native__MessageBox_showSimpleMessageBox(nar_runtime_t rt,
         nar_object_t icon, nar_object_t title, nar_object_t message, nar_object_t window);

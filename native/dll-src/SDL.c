@@ -158,12 +158,22 @@ nar_object_t native__wasInit(nar_runtime_t rt, nar_object_t subSystems, nar_obje
     return cmd_new(rt, toMsg, subSystems, was_init);
 }
 
+typedef struct {
+    nar_program_sub_trigger_fn_t trigger;
+    nar_sub_state_t *sub_state;
+} sub_quit_t;
+
 void quit_sdl(
         nar_runtime_t rt,
         nar_object_t payload,
         nar_program_task_resolve_fn_t resolve,
         nar_program_task_reject_fn_t reject,
         nar_task_state_t *task_state) {
+    sub_quit_t *sub_quit = (sub_quit_t *) nar->get_metadata(rt, NAR_META__Nar_SDL_onQuit_sub);
+    if (NULL != sub_quit) {
+        sub_quit->trigger(rt, nar->make_unit(rt), sub_quit->sub_state);
+    }
+
     SDL_Quit();
     nar_program_updater_remove_t updater_remove =
             nar->get_metadata(rt, NAR_META__Nar_Program_updater_remove);
@@ -174,4 +184,29 @@ void quit_sdl(
 nar_object_t native__quit(nar_runtime_t rt) {
     nar_program_task_new_fn_t task_new = nar->get_metadata(rt, NAR_META__Nar_Program_task_new);
     return task_new(rt, nar->make_unit(rt), quit_sdl);
+}
+
+void quit_on(nar_runtime_t rt, nar_object_t payload, nar_program_sub_trigger_fn_t trigger,
+        nar_sub_state_t *sub_state) {
+    sub_quit_t *sub_quit = (sub_quit_t *) nar->get_metadata(rt, NAR_META__Nar_SDL_onQuit_sub);
+    if (NULL != sub_quit) {
+        nar->free(sub_quit);
+    }
+    sub_quit = nar->alloc(sizeof(sub_quit_t));
+    sub_quit->trigger = trigger;
+    sub_quit->sub_state = sub_state;
+    nar->set_metadata(rt, NAR_META__Nar_SDL_onQuit_sub, sub_quit);
+}
+
+void quit_off(nar_runtime_t rt, nar_object_t payload) {
+    sub_quit_t *sub_quit = (sub_quit_t *) nar->get_metadata(rt, NAR_META__Nar_SDL_onQuit_sub);
+    if (NULL != sub_quit) {
+        nar->free(sub_quit);
+    }
+    nar->set_metadata(rt, NAR_META__Nar_SDL_onQuit_sub, NULL);
+}
+
+nar_object_t native__onQuit(nar_runtime_t rt, nar_object_t toMsg) {
+    nar_program_sub_new_fn_t sub_new = nar->get_metadata(rt, NAR_META__Nar_Program_sub_new);
+    return sub_new(rt, toMsg, NAR_INVALID_OBJECT, &quit_on, &quit_off);
 }
