@@ -1,0 +1,350 @@
+module Nar.SDL.Render
+
+type RendererFlag
+  = RendererFlagSoftware
+  | RendererFlagAccelerated
+  | RendererFlagPresentVSync
+  | RendererFlagTargetTexture
+
+alias RendererInfo =
+  { name: String
+  , flags: List[RendererFlag]
+  , textureFormats: List[PixelFormat]
+  , maxTextureWidth: Int
+  , maxTextureHeight: Int
+  }
+
+alias Vertex =
+  { position: FPoint
+  , color: Color
+  , texCoord: FPoint
+  }
+
+type ScaleMode
+  = ScaleModeNearest
+  | ScaleModeLinear
+  | ScaleModeBest
+
+type TextureAccess
+  = TextureAccessStatic
+  | TextureAccessStreaming
+  | TextureAccessTarget
+
+type TextureModulate
+  = TextureModulateNone
+  | TextureModulateColor
+  | TextureModulateAlpha
+
+type RendererFlip
+  = RendererFlipNone
+  | RendererFlipHorizontal
+  | RendererFlipVertical
+
+alias native Renderer
+
+alias native Texture
+
+def native numRenderDrivers: Result[String, Int]
+
+def native getRenderDriverInfo(index: Int): Result[String, RendererInfo]
+
+def native createWindowAndRenderer(
+  width: Int, height: Int, flags: List[WindowFlag]
+): Task[String, (Window, Renderer)]
+
+def native createRenderer(
+  window: Window, index: Maybe[Int], flags: List[RendererFlag]
+): Task[String, Renderer]
+
+def native createSoftwareRenderer(
+  surface: Surface
+): Task[String, Renderer]
+
+def native getRenderer(window: Window): Result[String, Renderer]
+
+def native renderGetWindow(renderer: Renderer): Result[String, Window]
+
+def native getRendererInfo(renderer: Renderer): Result[String, RendererInfo]
+
+def native getRendererOutputSize(renderer: Renderer): Result[String, (Int, Int)]
+
+def native createTexture(
+  renderer: Renderer, format: PixelFormat, access: TextureAccess,
+  w: Int, h: Int
+): Task[String, Texture]
+
+def native createTextureFromSurface(
+  renderer: Renderer, surface: Surface
+): Task[String, Texture]
+
+alias TextureInfo =
+  { format: PixelFormat
+  , access: TextureAccess
+  , w: Int
+  , h: Int
+  }
+
+def native queryTexture(
+  texture: Texture
+): Result[String, TextureInfo]
+
+def native setTextureColorMod(
+  texture: Texture, r: Int, g: Int, b: Int
+): Result[String, Texture]
+
+def native getTextureColorMod(
+  texture: Texture
+): Result[String, (Int, Int, Int)]
+
+def native setTextureAlphaMod(
+  texture: Texture, alpha: Int
+): Result[String, Texture]
+
+def native getTextureAlphaMod(
+  texture: Texture
+): Result[String, Int]
+
+def native setTextureBlendMode(
+  texture: Texture, blendMode: BlendMode
+): Result[String, Texture]
+
+def native getTextureBlendMode(
+  texture: Texture
+): Result[String, BlendMode]
+
+def native setTextureScaleMode(
+  texture: Texture, scaleMode: ScaleMode
+): Result[String, Texture]
+
+def native getTextureScaleMode(
+  texture: Texture
+): Result[String, ScaleMode]
+
+def native setTextureUserData(
+  texture: Texture, userData: Ptr
+): Result[String, Texture]
+
+def native getTextureUserData(
+  texture: Texture
+): Result[String, Ptr]
+
+def native updateTexture(
+  texture: Texture, rect: Rect, pixels: Ptr, pitch: Int
+): Result[String, Texture]
+
+def native updateYUVTexture(
+  texture: Texture, rect: Rect, 
+  yPlane: Ptr, yPitch: Int,
+  uPlane: Ptr, uPitch: Int,
+  vPlane: Ptr, vPitch: Int
+): Result[String, Texture]
+
+def native lockTexture(
+  texture: Texture, rect: Rect
+): Task[String, (Ptr, Int)]
+
+def native lockTextureToSurface(
+  texture: Texture, rect: Rect
+): Task[String, Surface]
+
+def native unlockTexture(texture: Texture): Task[String, ()]
+
+def native renderTargetSupported(renderer: Renderer): Bool
+
+def native setRenderTarget(
+  renderer: Renderer, texture: Maybe[Texture]
+): Result[String, Renderer]
+
+def native getRenderTarget(
+  renderer: Renderer
+): Maybe[Texture]
+
+def native renderSetLogicalSize(
+  renderer: Renderer, w: Int, h: Int
+): Result[String, Renderer]
+
+def native renderGetLogicalSize(
+  renderer: Renderer
+): (Int, Int)
+
+def native renderSetIntegerScale(
+  renderer: Renderer, enable: Bool
+): Result[String, Renderer]
+
+def native renderGetIntegerScale(
+  renderer: Renderer
+): Bool
+
+def native renderSetViewport(
+  renderer: Renderer, rect: Rect
+): Result[String, Renderer]
+
+def native renderGetViewport(
+  renderer: Renderer
+): Rect
+
+def native renderSetClipRect(
+  renderer: Renderer, rect: Rect
+): Result[String, Renderer]
+
+def native renderGetClipRect(
+  renderer: Renderer
+): Rect
+
+def native renderIsClipEnabled(renderer: Renderer): Bool
+
+def native renderSetScale(
+  renderer: Renderer, scaleX: Float, scaleY: Float
+): Result[String, Renderer]
+
+def native renderGetScale(
+  renderer: Renderer
+): (Float, Float)
+
+def native renderWindowToLogical(
+  renderer: Renderer, x: Float, y: Float
+): (Float, Float)
+
+def native renderLogicalToWindow(
+  renderer: Renderer, x: Float, y: Float
+): (Int, Int)
+
+def native setRenderDrawColor(
+  renderer: Renderer, r: Int, g: Int, b: Int, a: Int
+): Result[String, Renderer]
+
+def native getRenderDrawColor(
+  renderer: Renderer
+): (Int, Int, Int, Int)
+
+def native setRenderDrawBlendMode(
+  renderer: Renderer, blendMode: BlendMode
+): Result[String, Renderer]
+
+def native getRenderDrawBlendMode(
+  renderer: Renderer
+): BlendMode
+
+def native renderClear(renderer: Renderer): Task[String, Renderer]
+
+def native renderDrawPoint(
+  renderer: Renderer, x: Int, y: Int
+): Task[String, Renderer]
+
+def native renderDrawPoints(
+  renderer: Renderer, points: List[Point]
+): Task[String, Renderer]
+
+def native renderDrawLine(
+  renderer: Renderer, x1: Int, y1: Int, x2: Int, y2: Int
+): Task[String, Renderer]
+
+def native renderDrawLines(
+  renderer: Renderer, points: List[Point]
+): Task[String, Renderer]
+
+def native renderDrawRect(
+  renderer: Renderer, rect: Rect
+): Task[String, Renderer]
+
+def native renderDrawRects(
+  renderer: Renderer, rects: List[Rect]
+): Task[String, Renderer]
+
+def native renderFillRect(
+  renderer: Renderer, rect: Rect
+): Task[String, Renderer]
+
+def native renderFillRects(
+  renderer: Renderer, rects: List[Rect]
+): Task[String, Renderer]
+
+def native renderCopy(
+  renderer: Renderer, texture: Texture,
+  srcRect: Maybe[Rect], dstRect: Maybe[Rect]
+): Task[String, Renderer]
+
+def native renderCopyEx(
+  renderer: Renderer, texture: Texture,
+  srcRect: Maybe[Rect], dstRect: Maybe[Rect],
+  angle: Float, center: Maybe[Point], flip: RendererFlip
+): Task[String, Renderer]
+
+def native renderDrawPointF(
+  renderer: Renderer, x: Float, y: Float
+): Task[String, Renderer]
+
+def native renderDrawPointsF(
+  renderer: Renderer, points: List[FPoint]
+): Task[String, Renderer]
+
+def native renderDrawLineF(
+  renderer: Renderer, x1: Float, y1: Float, x2: Float, y2: Float
+): Task[String, Renderer]
+
+def native renderDrawLinesF(
+  renderer: Renderer, points: List[FPoint]
+): Task[String, Renderer]
+
+def native renderDrawRectF(
+  renderer: Renderer, rect: FRect
+): Task[String, Renderer]
+
+def native renderDrawRectsF(
+  renderer: Renderer, rects: List[FRect]
+): Task[String, Renderer]
+
+def native renderFillRectF(
+  renderer: Renderer, rect: FRect
+): Task[String, Renderer]
+
+def native renderFillRectsF(
+  renderer: Renderer, rects: List[FRect]
+): Task[String, Renderer]
+
+def native renderCopyF(
+  renderer: Renderer, texture: Texture,
+  srcRect: Maybe[Rect], dstRect: Maybe[FRect]
+): Task[String, Renderer]
+
+def native renderCopyExF(
+  renderer: Renderer, texture: Texture,
+  srcRect: Maybe[Rect], dstRect: Maybe[FRect],
+  angle: Float, center: Maybe[Point], flip: RendererFlip
+): Task[String, Renderer]
+
+def native renderGeometry(
+  renderer: Renderer, texture: Texture,
+  vertices: List[Vertex], indices: List[Int]
+): Task[String, Renderer]
+
+def native renderGeometryRaw(
+  renderer: Renderer, texture: Texture,
+  xy: Ptr, xyStride: Int,
+  color: Ptr, colorStride: Int,
+  uv: Ptr, uvStride: Int,
+  numVertices: Int,
+  indices: Ptr, numIndices: Int, sizeIndices: Int
+): Task[String, Renderer]
+
+def native renderReadPixels(
+  renderer: Renderer, rect: Rect, format: PixelFormat, pixels: Ptr, pitch: Int
+): Task[String, ()]
+
+def native renderPresent(renderer: Renderer): Task[String, Renderer]
+
+def native destroyTexture(texture: Texture): Task[String, ()]
+
+def native destroyRenderer(renderer: Renderer): Task[String, ()]
+
+def native renderFlush(renderer: Renderer): Task[String, Renderer]
+
+def native glBindTexture(texture: Texture): Task[String, (Float, Float)]
+
+def native glUnbindTexture(texture: Texture): Task[String, ()]
+
+def native renderGetMetalLayer(renderer: Renderer): Maybe[Ptr]
+
+def native renderGetMetalCommandEncoder(renderer: Renderer): Maybe[Ptr]
+
+def native renderSetVSync(renderer: Renderer, enable: Int): Result[String, Renderer]

@@ -4,31 +4,38 @@
 #include <nar.h>
 #include <nar-package.h>
 #include "include/Nar.SDL.h"
+#include <SDL.h>
 
 #define NAR_META__Nar_SDL_onQuit_sub "Nar.SDL.onQuit:sub"
+#define NAR_META__Nar_SDL_Video_windowHitTest_data "Nar.SDL.Video.windowHitTest:data"
 
 extern nar_t *nar;
 
-nar_object_t native__init(nar_runtime_t rt, nar_object_t subSystems);
+void init_blend_mode(nar_runtime_t rt);
+void init_message_box(nar_runtime_t rt);
+void init_pixels(nar_runtime_t rt);
+void init_rect(nar_runtime_t rt);
+void init_render(nar_runtime_t rt);
+void init_sdl(nar_runtime_t rt);
+void init_video(nar_runtime_t rt);
 
-nar_object_t native__initSubSystem(nar_runtime_t rt, nar_object_t subSystem);
 
-nar_object_t native__quitSubSystem(nar_runtime_t rt, nar_object_t subSystem);
+void map_Color(nar_runtime_t rt, nar_object_t obj, nar_cstring_t key, SDL_Color *result);
 
-nar_object_t native__wasInit(nar_runtime_t rt, nar_object_t subSystems, nar_object_t toMsg);
+void map_Point(nar_runtime_t rt, nar_cstring_t key, nar_object_t value, SDL_Point *point);
 
-nar_object_t native__quit(nar_runtime_t rt);
+nar_object_t make_Point(nar_runtime_t rt, const SDL_Point *point);
 
-nar_object_t native__onQuit(nar_runtime_t rt, nar_object_t toMsg);
+void map_FPoint(nar_runtime_t rt, nar_cstring_t key, nar_object_t value, SDL_FPoint *point);
 
-nar_object_t native__MessageBox_showSimpleMessageBox(nar_runtime_t rt,
-        nar_object_t icon, nar_object_t title, nar_object_t message, nar_object_t window);
+nar_object_t make_FPoint(nar_runtime_t rt, const SDL_FPoint *point);
 
-nar_object_t native__MessageBox_showMessageBox(nar_runtime_t rt, nar_object_t data);
+void map_Rect(nar_runtime_t rt, nar_cstring_t key, nar_object_t value, SDL_Rect *rect);
 
-nar_object_t native__createWindow(nar_runtime_t rt, nar_object_t title, nar_object_t position,
-        nar_object_t width, nar_object_t height, nar_object_t flags);
+nar_object_t make_Rect(nar_runtime_t rt, const SDL_Rect *rect);
 
-nar_object_t native__destroyWindow(nar_runtime_t rt, nar_object_t window);
+void map_FRect(nar_runtime_t rt, nar_cstring_t key, nar_object_t value, SDL_FRect *rect);
+
+nar_object_t make_FRect(nar_runtime_t rt, const SDL_FRect *rect);
 
 #endif //PACKAGE_H

@@ -1,0 +1,38 @@
+module Nar.SDL.BlendMode
+
+type BlendMode
+  = ModeNone
+  | ModeBlend
+  | ModeAdd
+  | ModeMod
+  | ModeMul
+  | ModeInvalid
+  | BlendModeCustom(Int)
+
+type BlendOperation
+  = OperationAdd
+  | OperationSubtract
+  | OperationRevSubtract
+  | OperationMinimum
+  | OperationMaximum
+
+type BlendFactor
+  = FactorZero
+  | FactorOne
+  | FactorSrcColor
+  | FactorOneMinusSrcColor
+  | FactorSrcAlpha
+  | FactorOneMinusSrcAlpha
+  | FactorDstColor
+  | FactorOneMinusDstColor
+  | FactorDstAlpha
+  | FactorOneMinusDstAlpha
+
+def native composeCustomBlendMode(
+  srcColorFactor: BlendFactor,
+  dstColorFactor: BlendFactor,
+  colorOperation: BlendOperation,
+  srcAlphaFactor: BlendFactor,
+  dstAlphaFactor: BlendFactor,
+  alphaOperation: BlendOperation
+): BlendMode

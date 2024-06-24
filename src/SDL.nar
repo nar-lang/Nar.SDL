@@ -14,10 +14,12 @@ def native init(subsystems: List[InitSubSystem]): Task[String, List[InitSubSyste
 
 def native initSubSystem(subsystem: InitSubSystem): Task[String, InitSubSystem]
 
-def native quitSubSystem(subsystem: InitSubSystem): Task[x, InitSubSystem]
+def native quitSubSystem(subsystem: InitSubSystem): Task[String, InitSubSystem]
 
-def native wasInit(subSystems: List[InitSubSystem], toMsg: (List[InitSubSystem]):msg ): Cmd[msg]
+def native wasInit(subSystems: List[InitSubSystem]): Task[String, List[InitSubSystem]]
 
-def native quit: Task[Never, ()]
+def native quit: Task[String, ()]
 
-def native onQuit: Sub[msg]
+def native onQuit(toMsg: ( () ): msg): Sub[msg]
+
+alias native Ptr

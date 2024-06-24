@@ -16,8 +16,12 @@ add_library(Nar.SDL SHARED
         include/Nar.SDL.h
         _package.c
         _package.h
-        SDL.c
+        BlendMode.c
         MessageBox.c
+        Pixels.c
+        Rect.c
+        Render.c
+        SDL.c
         Video.c
 )
 

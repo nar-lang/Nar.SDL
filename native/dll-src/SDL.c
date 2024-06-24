@@ -2,37 +2,6 @@
 #include <Nar.Program.h>
 #include <SDL.h>
 
-Uint32 subsystem_to_flag(nar_runtime_t rt, nar_object_t subSystem) {
-    nar_option_t opt = nar->to_option(rt, subSystem);
-    nar_cstring_t name = opt.name;
-
-    if (0 == strcmp(Nar_SDL_InitSubSystem__InitTimer, name)) {
-        return SDL_INIT_TIMER;
-    }
-    if (0 == strcmp(Nar_SDL_InitSubSystem__InitAudio, name)) {
-        return SDL_INIT_AUDIO;
-    }
-    if (0 == strcmp(Nar_SDL_InitSubSystem__InitVideo, name)) {
-        return SDL_INIT_VIDEO;
-    }
-    if (0 == strcmp(Nar_SDL_InitSubSystem__InitJoystick, name)) {
-        return SDL_INIT_JOYSTICK;
-    }
-    if (0 == strcmp(Nar_SDL_InitSubSystem__InitHaptic, name)) {
-        return SDL_INIT_HAPTIC;
-    }
-    if (0 == strcmp(Nar_SDL_InitSubSystem__InitGameController, name)) {
-        return SDL_INIT_GAMECONTROLLER;
-    }
-    if (0 == strcmp(Nar_SDL_InitSubSystem__InitEvents, name)) {
-        return SDL_INIT_EVENTS;
-    }
-    if (0 == strcmp(Nar_SDL_InitSubSystem__InitSensor, name)) {
-        return SDL_INIT_SENSOR;
-    }
-    return 0;
-}
-
 nar_bool_t update() {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -43,20 +12,9 @@ nar_bool_t update() {
     return nar_true;
 }
 
-Uint32 subsystem_list_to_flag(nar_runtime_t rt, nar_object_t subSystems) {
-    Uint32 flags = 0;
-    nar_object_t it = subSystems;
-    while (nar->index_is_valid(rt, it)) {
-        nar_list_item_t item = nar->to_list_item(rt, it);
-        flags |= subsystem_to_flag(rt, item.value);
-        it = item.next;
-    }
-    return flags;
-}
-
-void init_sdl(nar_runtime_t rt, nar_object_t payload, nar_program_task_resolve_fn_t resolve,
+void init_sdl_task(nar_runtime_t rt, nar_object_t payload, nar_program_task_resolve_fn_t resolve,
         nar_program_task_reject_fn_t reject, nar_task_state_t *task_state) {
-    Uint32 flags = subsystem_list_to_flag(rt, payload);
+    Uint32 flags = nar->to_enum_option_flags(rt, payload);
     if (0 == SDL_Init(flags)) {
         nar_program_updater_add_t updater_add =
                 nar->get_metadata(rt, NAR_META__Nar_Program_updater_add);
@@ -68,9 +26,10 @@ void init_sdl(nar_runtime_t rt, nar_object_t payload, nar_program_task_resolve_f
     }
 }
 
-nar_object_t native__init(nar_runtime_t rt, nar_object_t subSystems) {
+nar_object_t /* Task[String, List[InitSubSystem]] */ native__init(nar_runtime_t rt,
+        nar_object_t subSystems /* List[InitSubSystem] */) {
     nar_program_task_new_fn_t task_new = nar->get_metadata(rt, NAR_META__Nar_Program_task_new);
-    return task_new(rt, subSystems, init_sdl);
+    return task_new(rt, subSystems, init_sdl_task);
 }
 
 void init_subsystem_exec(
@@ -79,7 +38,7 @@ void init_subsystem_exec(
         nar_program_task_resolve_fn_t resolve,
         nar_program_task_reject_fn_t reject,
         nar_task_state_t *task_state) {
-    Uint32 flags = subsystem_to_flag(rt, payload);
+    Uint32 flags = nar->to_enum_option(rt, payload);
     if (0 == SDL_InitSubSystem(flags)) {
         resolve(rt, payload, task_state);
     } else {
@@ -88,7 +47,8 @@ void init_subsystem_exec(
     }
 }
 
-nar_object_t native__initSubSystem(nar_runtime_t rt, nar_object_t subSystem) {
+nar_object_t /* Task[String, InitSubSystem] */ native__initSubSystem(nar_runtime_t rt,
+        nar_object_t subSystem /* InitSubSystem */) {
     nar_program_task_new_fn_t task_new = nar->get_metadata(rt, NAR_META__Nar_Program_task_new);
     return task_new(rt, subSystem, init_subsystem_exec);
 }
@@ -99,12 +59,13 @@ void quit_subsystem(
         nar_program_task_resolve_fn_t resolve,
         nar_program_task_reject_fn_t reject,
         nar_task_state_t *task_state) {
-    Uint32 flags = subsystem_to_flag(rt, payload);
+    Uint32 flags = nar->to_enum_option(rt, payload);
     SDL_QuitSubSystem(flags);
     resolve(rt, payload, task_state);
 }
 
-nar_object_t native__quitSubSystem(nar_runtime_t rt, nar_object_t subSystem) {
+nar_object_t /* Task[String, InitSubSystem] */ native__quitSubSystem(nar_runtime_t rt,
+        nar_object_t subSystem /* InitSubSystem */) {
     nar_program_task_new_fn_t task_new = nar->get_metadata(rt, NAR_META__Nar_Program_task_new);
     return task_new(rt, subSystem, quit_subsystem);
 }
@@ -112,9 +73,10 @@ nar_object_t native__quitSubSystem(nar_runtime_t rt, nar_object_t subSystem) {
 void was_init(
         nar_runtime_t rt,
         nar_object_t payload,
-        nar_program_cmd_resolve_fn_t resolve,
-        nar_cmd_state_t *cmd_state) {
-    Uint32 flags = subsystem_list_to_flag(rt, payload);
+        nar_program_task_resolve_fn_t resolve,
+        nar_program_task_reject_fn_t reject,
+        nar_task_state_t *task_state) {
+    Uint32 flags = nar->to_enum_option_flags(rt, payload);
     Uint32 initialized = SDL_WasInit(flags);
     nar_object_t list = nar->make_list(rt, 0, NULL);
     if (0 != (initialized & SDL_INIT_TIMER)) {
@@ -150,12 +112,13 @@ void was_init(
         nar_object_t value = nar->make_option(rt, Nar_SDL_InitSubSystem__InitSensor, 0, NULL);
         list = nar->make_list_cons(rt, value, list);
     }
-    resolve(rt, list, cmd_state);
+    resolve(rt, list, task_state);
 }
 
-nar_object_t native__wasInit(nar_runtime_t rt, nar_object_t subSystems, nar_object_t toMsg) {
-    nar_program_cmd_new_fn_t cmd_new = nar->get_metadata(rt, NAR_META__Nar_Program_cmd_new);
-    return cmd_new(rt, toMsg, subSystems, was_init);
+nar_object_t /* Task[String, List[InitSubSystem]] */ native__wasInit(nar_runtime_t rt,
+        nar_object_t subSystems /* List[InitSubSystem] */) {
+    nar_program_task_new_fn_t task_new = nar->get_metadata(rt, NAR_META__Nar_Program_task_new);
+    return task_new(rt, subSystems, was_init);
 }
 
 typedef struct {
@@ -181,7 +144,7 @@ void quit_sdl(
     resolve(rt, nar->make_unit(rt), task_state);
 }
 
-nar_object_t native__quit(nar_runtime_t rt) {
+nar_object_t /* Task[String, ()] */ native__quit(nar_runtime_t rt) {
     nar_program_task_new_fn_t task_new = nar->get_metadata(rt, NAR_META__Nar_Program_task_new);
     return task_new(rt, nar->make_unit(rt), quit_sdl);
 }
@@ -206,7 +169,27 @@ void quit_off(nar_runtime_t rt, nar_object_t payload) {
     nar->set_metadata(rt, NAR_META__Nar_SDL_onQuit_sub, NULL);
 }
 
-nar_object_t native__onQuit(nar_runtime_t rt, nar_object_t toMsg) {
+nar_object_t /* Sub[msg] */ native__onQuit(nar_runtime_t rt,
+        nar_object_t toMsg /* ( () ): msg */) {
     nar_program_sub_new_fn_t sub_new = nar->get_metadata(rt, NAR_META__Nar_Program_sub_new);
     return sub_new(rt, toMsg, NAR_INVALID_OBJECT, &quit_on, &quit_off);
+}
+
+void init_sdl(nar_runtime_t rt) {
+    nar->register_def(rt, "Nar.SDL", "init", &native__init, 1);
+    nar->register_def(rt, "Nar.SDL", "initSubSystem", &native__initSubSystem, 1);
+    nar->register_def(rt, "Nar.SDL", "quitSubSystem", &native__quitSubSystem, 1);
+    nar->register_def(rt, "Nar.SDL", "wasInit", &native__wasInit, 1);
+    nar->register_def(rt, "Nar.SDL", "quit", &native__quit, 0);
+    nar->register_def(rt, "Nar.SDL", "onQuit", &native__onQuit, 1);
+
+    nar->enum_def(Nar_SDL_InitSubSystem, Nar_SDL_InitSubSystem__InitTimer, SDL_INIT_TIMER);
+    nar->enum_def(Nar_SDL_InitSubSystem, Nar_SDL_InitSubSystem__InitAudio, SDL_INIT_AUDIO);
+    nar->enum_def(Nar_SDL_InitSubSystem, Nar_SDL_InitSubSystem__InitVideo, SDL_INIT_VIDEO);
+    nar->enum_def(Nar_SDL_InitSubSystem, Nar_SDL_InitSubSystem__InitJoystick, SDL_INIT_JOYSTICK);
+    nar->enum_def(Nar_SDL_InitSubSystem, Nar_SDL_InitSubSystem__InitHaptic, SDL_INIT_HAPTIC);
+    nar->enum_def(Nar_SDL_InitSubSystem, Nar_SDL_InitSubSystem__InitGameController,
+            SDL_INIT_GAMECONTROLLER);
+    nar->enum_def(Nar_SDL_InitSubSystem, Nar_SDL_InitSubSystem__InitEvents, SDL_INIT_EVENTS);
+    nar->enum_def(Nar_SDL_InitSubSystem, Nar_SDL_InitSubSystem__InitSensor, SDL_INIT_SENSOR);
 }

@@ -1,0 +1,45 @@
+module Nar.SDL.Rect
+
+alias Point = { x: Int , y: Int }
+
+alias FPoint = { x: Float , y: Float }
+
+alias Rect = { x: Int, y: Int, w: Int, h: Int }
+
+alias FRect = { x: Float, y: Float, w: Float, h: Float }
+
+def native pointInRect(p: Point, r: Rect): Bool
+
+def native rectEmpty(r: Rect): Bool
+
+def native rectEquals(a: Rect, b: Rect): Bool
+
+def native hasIntersection(a: Rect, b: Rect): Bool
+
+def native intersectRect(a: Rect, b: Rect): Maybe[Rect]
+
+def native unionRect(a: Rect, b: Rect): Rect
+
+def native enclosePoints(points: List[Point], clip: Maybe[Rect]): Rect
+
+def native intersectRectAndLine(
+    rect: Rect, x1: Int, y1: Int, x2: Int, y2: Int
+): Maybe[(Point, Point)]
+
+def native pointInFRect(p: FPoint, r: FRect): Bool
+
+def native fRectEmpty(r: FRect): Bool
+
+def native fRectEquals(a: FRect, b: FRect): Bool
+
+def native hasIntersectionF(a: FRect, b: FRect): Bool
+
+def native intersectFRect(a: FRect, b: FRect): Maybe[FRect]
+
+def native unionFRect(a: FRect, b: FRect): FRect
+
+def native encloseFPoints(points: List[FPoint], clip: Maybe[FRect]): FRect
+
+def native intersectFRectAndLine(
+    rect: FRect, x1: Float, y1: Float, x2: Float, y2: Float
+): Maybe[(FPoint, FPoint)]

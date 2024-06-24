@@ -1,0 +1,159 @@
+module Nar.SDL.Pixels
+
+type PixelType
+  = PixelTypeIndex1
+  | PixelTypeIndex4
+  | PixelTypeIndex8
+  | PixelTypePacked8
+  | PixelTypePacked16
+  | PixelTypePacked32
+  | PixelTypeArrayU8
+  | PixelTypeArrayU16
+  | PixelTypeArrayU32
+  | PixelTypeArrayF16
+  | PixelTypeArrayF32
+
+type BitmapOrder
+  = BitmapOrderNone
+  | BitmapOrder4321
+  | BitmapOrder1234
+
+type PackedOrder
+  = PackedOrderNone
+  | PackedOrderXRGB
+  | PackedOrderRGBX
+  | PackedOrderARGB
+  | PackedOrderRGBA
+  | PackedOrderXBGR
+  | PackedOrderBGRX
+  | PackedOrderABGR
+  | PackedOrderBGRA
+
+type ArrayOrder
+  = ArrayOrderNone
+  | ArrayOrderRGB
+  | ArrayOrderRGBA
+  | ArrayOrderARGB
+  | ArrayOrderBGR
+  | ArrayOrderBGRA
+  | ArrayOrderABGR
+
+  type PackedLayout
+  = PackedLayoutNone
+  | PackedLayout332
+  | PackedLayout4444
+  | PackedLayout1555
+  | PackedLayout5551
+  | PackedLayout565
+  | PackedLayout8888
+  | PackedLayout2101010
+  | PackedLayout1010102
+
+type PixelFormat
+  = PixelFormatIndex1LSB
+  | PixelFormatIndex1MSB
+  | PixelFormatIndex2LSB
+  | PixelFormatIndex2MSB
+  | PixelFormatIndex4LSB
+  | PixelFormatIndex4MSB
+  | PixelFormatIndex8
+  | PixelFormatRGB332
+  | PixelFormatXRGB4444
+  | PixelFormatRGB444
+  | PixelFormatXBGR4444
+  | PixelFormatBGR444
+  | PixelFormatXRGB1555
+  | PixelFormatRGB555
+  | PixelFormatXBGR1555
+  | PixelFormatBGR555
+  | PixelFormatARGB4444
+  | PixelFormatRGBA4444
+  | PixelFormatABGR4444
+  | PixelFormatBGRA4444
+  | PixelFormatARGB1555
+  | PixelFormatRGBA5551
+  | PixelFormatABGR1555
+  | PixelFormatBGRA5551
+  | PixelFormatRGB565
+  | PixelFormatBGR565
+  | PixelFormatRGB24
+  | PixelFormatBGR24
+  | PixelFormatXRGB8888
+  | PixelFormatRGB888
+  | PixelFormatRGBX8888
+  | PixelFormatXBGR8888
+  | PixelFormatBGR888
+  | PixelFormatBGRX8888
+  | PixelFormatARGB8888
+  | PixelFormatRGBA8888
+  | PixelFormatABGR8888
+  | PixelFormatBGRA8888
+  | PixelFormatARGB2101010
+  | PixelFormatRGBA32
+  | PixelFormatARGB32
+  | PixelFormatBGRA32
+  | PixelFormatABGR32
+  | PixelFormatRGBX32
+  | PixelFormatXRGB32
+  | PixelFormatBGRX32
+  | PixelFormatXBGR32
+  | PixelFormatYV12
+  | PixelFormatIYUV
+  | PixelFormatYUY2
+  | PixelFormatUYVY
+  | PixelFormatYVYU
+  | PixelFormatNV12
+  | PixelFormatNV21
+  | PixelFormatExternalOES
+
+alias Color = {r: Int, g: Int, b: Int, a: Int}
+
+alias native Palette
+
+alias native Format
+
+def native getPixelFormatName(format: PixelFormat): String
+
+def native pixelFormatToMasks(
+  format: PixelFormat
+): { bitsPerPixel: Int, rMask: Int, gMask: Int, bMask: Int, aMask: Int }
+
+def native masksToPixelFormat(
+  bitsPerPixel: Int, rMask: Int, gMask: Int, bMask: Int, aMask: Int
+): PixelFormat
+
+def native allocFormat(format: PixelFormat): Task[String, Format]
+
+def native freeFormat(format: Format): Task[String, ()]
+
+def native allocPalette(nColors: Int): Task[String, Palette]
+
+def native setPixelFormatPalette(
+  format: PixelFormat, palette: Palette
+): Task[String, Palette]
+
+def native setPaletteColors(
+  palette: Palette, colors: List[Color], firstColor: Int, nColors: Int
+): Task[String, Palette]
+
+def native freePalette(palette: Palette): Task[String, ()]
+
+def native mapRGB(
+  format: PixelFormat, r: Int, g: Int, b: Int
+): Int
+
+def native mapRGBA(
+  format: PixelFormat, r: Int, g: Int, b: Int, a: Int
+): Int
+
+def native getRGB(
+  pixel: Int, format: PixelFormat
+): (Int, Int, Int)
+
+def native getRGBA(
+  pixel: Int, format: PixelFormat
+): (Int, Int, Int, Int)
+
+def native calculateGammaRamp(
+  gamma: Float
+): List[Int]

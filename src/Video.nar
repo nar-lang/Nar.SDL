@@ -1,11 +1,19 @@
 module Nar.SDL.Video
 
+alias DisplayMode =
+  { format: PixelFormat
+  , width: Int
+  , height: Int
+  , refreshRate: Int
+  , driverData: Ptr
+  }
+
 alias native Window
 
 type WindowPosition
   = WindowPositionUndefined
   | WindowPositionCentered
-  | WindowPositionAt(x: Int, y: Int)
+  | WindowPositionAt(value: Int)
 
 type WindowFlag
     = WindowFlagFullscreen 
@@ -33,8 +41,374 @@ type WindowFlag
     | WindowFlagMetal            
     | WindowFlagInputGrabbed
 
+type WindowEvent
+  = WindowEventNone
+  | WindowEventShown
+  | WindowEventHidden
+  | WindowEventExposed
+  | WindowEventMoved
+  | WindowEventResized
+  | WindowEventSizeChanged
+  | WindowEventMinimized
+  | WindowEventMaximized
+  | WindowEventRestored
+  | WindowEventEnter
+  | WindowEventLeave
+  | WindowEventFocusGained
+  | WindowEventFocusLost
+  | WindowEventClose
+  | WindowEventTakeFocus
+  | WindowEventHitTest
+  | WindowEventIccProfChanged
+  | WindowEventDisplayChanged
+
+type DisplayEvent
+  = DisplayEventNone
+  | DisplayEventOrientation
+  | DisplayEventConnected
+  | DisplayEventDisconnected
+  | DisplayEventMoved
+
+type Orientation
+  = OrientationLandscape
+  | OrientationLandscapeFlipped
+  | OrientationPortrait
+  | OrientationPortraitFlipped
+
+type FlashOperation
+  = FlashOperationCancel
+  | FlashOperationBriefly
+  | FlashOperationUntilFocused
+
+alias native GLContext
+
+type GLAttr
+  = GLAttrRedSize
+  | GLAttrGreenSize
+  | GLAttrBlueSize
+  | GLAttrAlphaSize
+  | GLAttrBufferSize
+  | GLAttrDoublebuffer
+  | GLAttrDepthSize
+  | GLAttrStencilSize
+  | GLAttrAccumRedSize
+  | GLAttrAccumGreenSize
+  | GLAttrAccumBlueSize
+  | GLAttrAccumAlphaSize
+  | GLAttrStereo
+  | GLAttrMultisamplebuffers
+  | GLAttrMultisamplesamples
+  | GLAttrAcceleratedVisual
+  | GLAttrRetainedBacking
+  | GLAttrContextMajorVersion
+  | GLAttrContextMinorVersion
+  | GLAttrContextEgl
+  | GLAttrContextFlags
+  | GLAttrContextProfileMask
+  | GLAttrShareWithCurrentContext
+  | GLAttrFramebufferSrgbCapable
+  | GLAttrContextReleaseBehavior
+  | GLAttrContextResetNotification
+  | GLAttrContextNoError
+  | GLAttrFloatbuffers
+
+type GLProfile
+  = GLProfileCore
+  | GLProfileCompatibility
+  | GLProfileEs
+
+type GLContext
+  = GLContextDebug
+  | GLContextForwardCompatible
+  | GLContextRobustAccess
+  | GLContextResetIsolation
+
+type GLContextReleaseBehavior
+  = GLContextReleaseBehaviorNone
+  | GLContextReleaseBehaviorFlush
+
+type GLContextResetNotification
+  = GLContextResetNotificationNoError
+  | GLContextResetNotificationLoseContext
+
+def native numVideoDrivers: Int
+
+def native getVideoDriver(index: Int): Maybe[String]
+
+def native videoInit(driverName: Maybe[String]): Task[String, ()]
+
+def native videoQuit: Task[Never, ()]
+
+def native currentVideoDriver: Task[Never, String]
+
+def native numVideoDisplays: Int
+
+def native getDisplayName(displayIndex: Int): Maybe[String]
+
+def native getDisplayBounds(displayIndex: Int): Maybe[Rect]
+
+def native getDisplayUsableBounds(displayIndex: Int): Maybe[Rect]
+
+def native getDisplayDpi(displayIndex: Int): Maybe[(Float, Float, Float)]
+
+def native getDisplayOrientation(
+  displayIndex: Int
+): Maybe[Orientation]
+
+def native getNumDisplayModes(displayIndex: Int): Int
+
+def native getDisplayMode(
+  displayIndex: Int, modeIndex: Int
+): Maybe[DisplayMode]
+
+def native getNumDisplayModes(
+  displayIndex: Int
+): Maybe[Int]
+
+def native getCurrentDisplayMode(
+  displayIndex: Int
+): Result[String,  DisplayMode]
+
+def native getClosestDisplayMode(
+  displayIndex: Int, mode: DisplayMode
+): Result[String, DisplayMode]
+
+def native getPointDisplayIndex(point: Point): Result[String, Int]
+
+def native getRectDisplayIndex(rect: Rect): Result[String, Int]
+
+def native getWindowDisplayIndex(window: Window): Result[String, Int]
+
+def native setWindowDisplayMode(
+  window: Window, mode: DisplayMode
+): Result[String, Window]
+
+def native getWindowDisplayMode(
+  window: Window
+): Result[String, DisplayMode]
+
+def native getWindowICCProfile(
+  window: Window
+): Result[String, List[Int]]
+
+def native getWindowPixelFormat(
+  window: Window
+): Result[String, PixelFormat]
+
 def native createWindow(
-  title: String, pos: WindowPosition, width: Int, heigh: Int, flags: List[WindowFlag]
+  title: String, posX: WindowPosition, posY: WindowPosition,
+  width: Int, height: Int, flags: List[WindowFlag]
+): Task[String, Window]
+
+def native createWindowFrom(data: Ptr): Task[String, Window]
+
+def native getWindowID(window: Window): Result[String, Int]
+
+def native getWindowFromID(id: Int): Result[String, Window]
+
+def native getWindowFlags(window: Window): List[WindowFlag]
+
+def native setWindowTitle(window: Window, title: String): Window
+
+def native getWindowTitle(window: Window): Result[String, String]
+
+def native setWindowIcon(window: Window, icon: Surface): Window
+
+def native setWindowData(
+  window: Window, name: String, data: Ptr
+): (Window, Ptr)
+
+def native getWindowData(window: Window, name: String): Ptr
+
+def native setWindowPosition(
+  window: Window, x: Int, y: Int
+): Window
+
+def native getWindowPosition(window: Window): (Int, Int)
+
+def native setWindowSize(
+  window: Window, width: Int, height: Int
+): Window
+
+def native getWindowSize(window: Window): (Int, Int)
+
+def native getWindowBordersSize(
+  window: Window
+): Result[String, (Int, Int, Int, Int)]
+
+def native getWindowSizeInPixels(
+  window: Window
+): (Int, Int)
+
+def native setWindowMinimumSize(
+  window: Window, width: Int, height: Int
+): Window
+
+def native getWindowMinimumSize(
+  window: Window
+): (Int, Int)
+
+def native setWindowMaximumSize(
+  window: Window, width: Int, height: Int
+): Window
+
+def native getWindowMaximumSize(
+  window: Window
+): (Int, Int)
+
+def native setWindowBordered(
+  window: Window, bordered: Bool
+): Window
+
+def native setWindowResizable(
+  window: Window, resizable: Bool
+): Window
+
+def native setWindowAlwaysOnTop(
+  window: Window, alwaysOnTop: Bool
+): Window
+
+def native showWindow(window: Window): Window
+
+def native hideWindow(window: Window): Window
+
+def native raiseWindow(window: Window): Window
+
+def native maximizeWindow(window: Window): Window
+
+def native minimizeWindow(window: Window): Window
+
+def native restoreWindow(window: Window): Window
+
+type FullscreenMode
+  = FullscreenModeWindowed
+  | FullscreenModeBorderless
+  | FullscreenModeExclusive
+
+def native setWindowFullscreen(
+  window: Window, mode: FullscreenMode
+): Window
+
+def native hasWindowSurface(window: Window): Bool
+
+def native getWindowSurface(window: Window): Result[String, Surface]
+
+def native updateWindowSurface(window: Window): Task[String, Window]
+
+def native updateWindowSurfaceRects(
+  window: Window, rects: List[Rect]
+): Task[String, Window]
+
+def native destroyWindowSurface(window: Window): Task[String, Window]
+
+def native setWindowGrab(window: Window,  grabbed: Bool): Window
+
+def native setWindowKeyboardGrab(
+  window: Window, grabbed: Bool
+): Window
+
+def native setWindowMouseGrab(
+  window: Window, grabbed: Bool
+): Window
+
+def native getWindowGrab(window: Window): Bool
+
+def native getWindowKeyboardGrab(window: Window): Bool
+
+def native getWindowMouseGrab(window: Window): Bool
+
+def native grabbedWindow: Task[Maybe[Window]]
+
+def native setWindowMouseRect(
+  window: Window, rect: Rect
+): Result[String, Window]
+
+def native setWindowBrightness(
+  window: Window, brightness: Float
+): Result[String, Window]
+
+def native getWindowBrightness(window: Window): Float
+
+def native setWindowOpacity(
+  window: Window, opacity: Float
+): Result[String, Window]
+
+def native getWindowOpacity(window: Window): Result[String, Float]
+
+def native setWindowModalFor(
+  modalWindow: Window, parentWindow: Window
+): Result[String, Window]
+
+def native setWindowInputFocus(window: Window): Task[String, Window]
+
+def native setWindowGammaRamp(
+  window: Window, red: List[Int], green: List[Int], blue: List[Int]
+): Result[String, Window]
+
+def native getWindowGammaRamp(
+  window: Window
+): Result[String, (List[Int], List[Int], List[Int])]
+
+type HitTestResult
+  = HitTestNormal
+  | HitTestDraggable
+  | HitTestResizeTopLeft
+  | HitTestResizeTop
+  | HitTestResizeTopRight
+  | HitTestResizeRight
+  | HitTestResizeBottomRight
+  | HitTestResizeBottom
+  | HitTestResizeBottomLeft
+  | HitTestResizeLeft
+
+def native setWindowHitTest(
+  window: Window, callback: Maybe[(Window, Point): HitTestResult]
+): Result[String, Window]
+
+def native flashWindow(
+  window: Window, operation: FlashOperation
 ): Task[String, Window]
 
 def native destroyWindow(window: Window): Task[Never, ()]
+
+def native isScreenSaverEnabled: Task[Never, Bool]
+
+def native enableScreenSaver: Task[Never, ()]
+
+def native disableScreenSaver: Task[Never, ()]
+
+def native glLoadLibrary(path: String): Task[String, ()]
+
+def native glGetProcAddress(proc: String): Result[String, Ptr]
+
+def native glUnloadLibrary: Task[Never, ()]
+
+def native glExtensionSupported(extension: String): Bool
+
+def native glResetAttributes: Task[Never, ()]
+
+def native glSetAttribute(attr: GLAttr, value: Int): Task[String, ()]
+
+def native glGetAttribute(attr: GLAttr): Task[String, Int]
+
+def native glCreateContext(window: Window): Task[String, GLContext]
+
+def native glMakeCurrent(
+  window: Window, context: GLContext
+): Result[String, Window]
+
+def native glGetCurrentWindow: Task[String, Window]
+
+def native glGetCurrentContext: Task[String, GLContext]
+
+def native glGetDrawableSize(
+  window: Window
+): (Int, Int)
+
+def native glSetSwapInterval(interval: Int): Task[String, ()]
+
+def native glGetSwapInterval: Task[String, Int]
+
+def native glSwapWindow(window: Window): Task[String, Window]
+
+def native glDeleteContext(context: GLContext): Task[String, ()]
